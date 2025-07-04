@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from deepface import DeepFace
 import requests
 import tempfile
 
@@ -11,6 +10,8 @@ def home():
 
 @app.route('/verify', methods=['POST'])
 def verify_faces():
+    from deepface import DeepFace  # 👈 ย้ายมาในฟังก์ชัน
+
     try:
         data = request.get_json()
 
@@ -24,7 +25,7 @@ def verify_faces():
         img1 = requests.get(img1_url).content
         img2 = requests.get(img2_url).content
 
-        # สร้าง temp file สำหรับแต่ละภาพ
+        # ใช้ไฟล์ชั่วคราว
         with tempfile.NamedTemporaryFile(suffix=".jpg") as tmp1, tempfile.NamedTemporaryFile(suffix=".jpg") as tmp2:
             tmp1.write(img1)
             tmp1.flush()
@@ -32,12 +33,12 @@ def verify_faces():
             tmp2.write(img2)
             tmp2.flush()
 
-            # เรียก deepface.verify ด้วย model เบา
+            # เรียก DeepFace
             result = DeepFace.verify(
                 img1_path=tmp1.name,
                 img2_path=tmp2.name,
-                model_name='Facenet',          # ✅ เบากว่า VGG-Face
-                enforce_detection=False        # ✅ ไม่ต้องตรวจจับหน้าก่อน (ลด error)
+                model_name='Facenet',       # ✅ Model เบา
+                enforce_detection=False     # ✅ ไม่ต้องตรวจจับหน้า (ลด error)
             )
 
             return jsonify(result)
