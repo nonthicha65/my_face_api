@@ -1,4 +1,5 @@
-Flask==2.3.3
+flask
 deepface==0.0.79
-tensorflow==2.10.1
+opencv-python
 requests
+numpy
